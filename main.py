@@ -1,8 +1,11 @@
+import os
 import sys
+import glob
 import dlib
 import cv2
 
 predictor_path = 'dlib_dat/shape_predictor_5_face_landmarks.dat'
+face_data_path = 'I:\Dataset\CelebA\data512x512\*.jpg'
 
 detector = dlib.get_frontal_face_detector()
 sp = dlib.shape_predictor(predictor_path)
@@ -14,12 +17,19 @@ color_green = (0, 255, 0)
 color_blue = (255, 0, 0)
 line_width = 2
 
+faces = glob.glob(face_data_path)
+num_faces = len(faces)
+f = open('front_face_list.txt', 'w')
+counter = 0
+front_counter = 0
 while True:
-    ret_val, img = cam.read()
-    img = cv2.flip(img, 1)
-    rgb_image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    dets = detector(rgb_image)
-    #faces = dlib.full_object_detections()
+    #ret_val, img = cam.read()
+    img = dlib.load_rgb_image(faces[counter])
+    #img = cv2.flip(img, 1)
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    dets = detector(img)
+    #dets = detector(img)
+
     for det in dets:
         shape = sp(img, det)
         x1, y1 = shape.part(0).x, shape.part(0).y
@@ -30,11 +40,11 @@ while True:
 
         color = color_blue
         rect_color = color_green
-        if abs(y1 - y3) > 3:
+        if abs(y2 - y4) > 5:
             color = color_red
             rect_color = color_red
 
-        if abs(x5 - (x2 + x4) / 2) > 2:
+        if abs(x5 - (x2 + x4) / 2) > 6:
             color = color_red
             rect_color = color_red
 
@@ -42,10 +52,15 @@ while True:
         eye_height = abs((y1 + y3) / 2 - y5)
         ratio = eye_height / eye_width
         text = '{}'.format(ratio)
-        if ratio < 0.5:
+        if ratio < 0.45:
             color = color_red
             rect_color = color_red
 
+        if color == color_blue:
+            file_name = faces[counter]
+            base_name = os.path.basename(file_name) + '\n'
+            f.write(base_name)
+            front_counter += 1
 
         cv2.putText(img, text, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.8,
                     color, 1, cv2.LINE_AA)
@@ -60,6 +75,22 @@ while True:
         #break
 
     cv2.imshow('Face Detector', img)
-    if cv2.waitKey(1) == 27:
+    counter += 1
+    if counter % 100 == 0:
+        print(counter, front_counter)
+
+    if num_faces <= counter:
+        break
+
+    key = cv2.waitKey(1)
+    if key == 32 or key == 62 or key == 46:
+        counter += 1
+    if key == 60 or key == 44:
+        counter -= 1
+    if key == 27:
         break  # esc to quit
+
 cv2.destroyAllWindows()
+f.close()
+print('Total counter =', counter)
+print('Front Counter =', front_counter)
