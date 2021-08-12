@@ -4,9 +4,10 @@ import glob
 import dlib
 import cv2
 
-predictor_path = 'dlib_dat/shape_predictor_5_face_landmarks.dat'
-#face_data_path = '../Dataset/CelebA/data512x512\*.jpg'
-face_data_path = '../Dataset/CelebA/celeba\*.jpg'
+#predictor_path = 'dlib_dat/shape_predictor_5_face_landmarks.dat'
+predictor_path = 'dlib_dat/shape_predictor_68_face_landmarks.dat'
+face_data_path = '../Dataset/CelebA/data512x512\*.jpg'
+#face_data_path = '../Dataset/CelebA/celeba\*.jpg'
 
 detector = dlib.get_frontal_face_detector()
 sp = dlib.shape_predictor(predictor_path)
@@ -25,11 +26,11 @@ counter = 0
 front_counter = 0
 while True:
     # webcam
-    #ret_val, img = cam.read()
-    #img = cv2.flip(img, 1)
+    ret_val, img = cam.read()
+    img = cv2.flip(img, 1)
 
-    img = dlib.load_rgb_image(faces[counter])
-    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    #img = dlib.load_rgb_image(faces[counter])
+    #img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
     dets = detector(img)
 
     for det in dets:
@@ -59,13 +60,19 @@ while True:
             color = color_red
             rect_color = color_red
 
-        if color == color_blue:
-            file_name = faces[counter]
-            base_name = os.path.basename(file_name) + '\n'
-            f.write(base_name)
-            front_counter += 1
+        #if color == color_blue:
+        #    file_name = faces[counter]
+        #    base_name = os.path.basename(file_name) + '\n'
+        #    f.write(base_name)
+        #    front_counter += 1
+        #
+        #text = '{:3f}'.format(ratio) + '   ' + os.path.basename(faces[counter])
 
-        text = '{:3f}'.format(ratio) + '   ' + os.path.basename(faces[counter])
+
+
+        text = '{:3f}'.format(ratio)
+
+
         cv2.putText(img, text, (50, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.8,
                     color, 1, cv2.LINE_AA)
 
@@ -79,12 +86,12 @@ while True:
         #break
 
     cv2.imshow('Face Detector', img)
-    counter += 1
-    if counter % 100 == 0:
-        print(counter, front_counter)
-
-    if num_faces <= counter:
-        break
+    #counter += 1
+    #if counter % 100 == 0:
+    #    print(counter, front_counter)
+    #
+    #if num_faces <= counter:
+    #    break
 
     key = cv2.waitKey(1)
     if key == 32 or key == 62 or key == 46:
