@@ -5,7 +5,8 @@ import dlib
 import cv2
 
 predictor_path = 'dlib_dat/shape_predictor_5_face_landmarks.dat'
-face_data_path = 'I:\Dataset\CelebA\data512x512\*.jpg'
+#face_data_path = '../Dataset/CelebA/data512x512\*.jpg'
+face_data_path = '../Dataset/CelebA/celeba\*.jpg'
 
 detector = dlib.get_frontal_face_detector()
 sp = dlib.shape_predictor(predictor_path)
@@ -19,16 +20,17 @@ line_width = 2
 
 faces = glob.glob(face_data_path)
 num_faces = len(faces)
-f = open('front_face_list.txt', 'w')
+f = open('celeba_front_face_list.txt', 'w')
 counter = 0
 front_counter = 0
 while True:
+    # webcam
     #ret_val, img = cam.read()
-    img = dlib.load_rgb_image(faces[counter])
     #img = cv2.flip(img, 1)
+
+    img = dlib.load_rgb_image(faces[counter])
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
     dets = detector(img)
-    #dets = detector(img)
 
     for det in dets:
         shape = sp(img, det)
@@ -40,18 +42,19 @@ while True:
 
         color = color_blue
         rect_color = color_green
+        # check roll
         if abs(y2 - y4) > 5:
             color = color_red
             rect_color = color_red
-
+        # check yaw
         if abs(x5 - (x2 + x4) / 2) > 6:
             color = color_red
             rect_color = color_red
 
+        # check pitch
         eye_width = abs(x1 - x3)
         eye_height = abs((y1 + y3) / 2 - y5)
         ratio = eye_height / eye_width
-        text = '{}'.format(ratio)
         if ratio < 0.45:
             color = color_red
             rect_color = color_red
@@ -62,7 +65,8 @@ while True:
             f.write(base_name)
             front_counter += 1
 
-        cv2.putText(img, text, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.8,
+        text = '{:3f}'.format(ratio) + '   ' + os.path.basename(faces[counter])
+        cv2.putText(img, text, (50, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.8,
                     color, 1, cv2.LINE_AA)
 
         cv2.line(img, (x1, y1), (x2, y2), color, line_width)
