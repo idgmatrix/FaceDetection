@@ -8,7 +8,8 @@ import numpy as np
 #predictor_path = 'dlib_dat/shape_predictor_5_face_landmarks.dat'
 #predictor_path = 'dlib_dat/shape_predictor_68_face_landmarks.dat'
 predictor_path = 'dlib_dat/shape_predictor_68_face_landmarks_GTX.dat'
-face_data_path = '../Dataset/CelebA/data512x512\*.jpg'
+
+#face_data_path = '../Dataset/CelebA/data512x512\*.jpg'
 #face_data_path = '../Dataset/CelebA/celeba\*.jpg'
 
 detector = dlib.get_frontal_face_detector()
@@ -21,11 +22,11 @@ color_green = (0, 255, 0)
 color_blue = (255, 0, 0)
 line_width = 1
 
-faces = glob.glob(face_data_path)
-num_faces = len(faces)
-f = open('celeba_front_face_list.txt', 'w')
-counter = 0
-front_counter = 0
+#faces = glob.glob(face_data_path)
+#num_faces = len(faces)
+#f = open('celeba_front_face_list.txt', 'w')
+#counter = 0
+#front_counter = 0
 while True:
     # webcam
     ret_val, img = cam.read()
@@ -117,6 +118,7 @@ while True:
         break  # esc to quit
 
 cv2.destroyAllWindows()
-f.close()
-print('Total counter =', counter)
-print('Front Counter =', front_counter)
+
+#f.close()
+#print('Total counter =', counter)
+#print('Front Counter =', front_counter)
